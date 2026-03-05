@@ -578,7 +578,7 @@ export default function AdminPanel() {
                       className="clip-button bg-bg-card-hover border border-dashed border-border hover:border-neon-red text-text-muted hover:text-neon-red w-full py-3 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest transition-all duration-300"
                     >
                       <Plus size={16} />
-                      YENİ EGZERSİZ EKLE
+                      {t("admin.addExercise")}
                     </button>
                   )}
                   <div className="flex justify-end pt-2">
@@ -586,7 +586,7 @@ export default function AdminPanel() {
                       onClick={() => setPendingDayDelete(day)}
                       className="clip-button bg-bg-card-hover border border-neon-red/60 text-[10px] font-bold uppercase tracking-widest px-4 py-2 text-neon-red hover:bg-neon-red hover:text-white hover:border-neon-red transition-all duration-300"
                     >
-                      GÜNÜ SİL
+                      {t("admin.deleteDay")}
                     </button>
                   </div>
                 </div>
