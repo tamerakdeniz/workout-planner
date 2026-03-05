@@ -1,4 +1,4 @@
-## Gym Schedule
+# workout-planner
 
 A small **Next.js + Firebase** app for managing a gym training schedule (days, exercises, YouTube demo links, etc.).
 
@@ -78,15 +78,12 @@ Make sure your `.env.local` has valid admin credentials before running this.
 - **Ignored files**:
   - `node_modules`, `.next`, build output, `.vercel`, and all `.env*` files are already covered by `.gitignore`.
 
-To create a new repository:
+### Git usage
 
-1. In this folder, run:
+This repository is already connected to GitHub. After making changes locally:
 
-   ```bash
-   git init
-   git add .
-   git commit -m "Initial commit"
-   ```
-
-2. Create an empty repo on GitHub and follow the instructions it gives to add the `origin` remote and `git push` your local branch.
-
+```bash
+git add .
+git commit -m "Your message"
+git push
+```
