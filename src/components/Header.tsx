@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Flame, Languages } from "lucide-react";
+import Image from "next/image";
+import { Languages } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 
 export default function Header() {
@@ -10,10 +11,17 @@ export default function Header() {
   return (
     <header className="border-b border-border bg-bg-primary/80 backdrop-blur-md sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="clip-button bg-neon-red p-2 group-hover:shadow-[0_0_15px_rgba(220,38,38,0.5)] transition-all duration-300">
-            <Flame size={22} className="text-white" />
-          </div>
+        <Link href="/" className="flex items-center gap-3 group shrink-0">
+          <span className="size-14 flex shrink-0 items-center justify-center overflow-hidden">
+            <Image
+              src="/img/logo.png"
+              alt="Gym Schedule"
+              width={56}
+              height={56}
+              className="size-14 object-contain object-center transition-opacity group-hover:opacity-90"
+              priority
+            />
+          </span>
           <div>
             <h1 className="text-lg sm:text-xl font-bold uppercase tracking-[0.15em] text-text-primary">
               {t("header.titleMain")}

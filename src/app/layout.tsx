@@ -14,7 +14,11 @@ export const metadata: Metadata = {
   description:
     "Kişisel 5 günlük antrenman takip uygulaması / Personal 5-day workout tracking app",
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/img/logo.ico", sizes: "48x48", type: "image/x-icon" },
+    ],
+    apple: "/img/logo.png",
   },
 };
 
