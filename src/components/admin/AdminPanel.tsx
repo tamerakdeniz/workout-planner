@@ -71,6 +71,7 @@ export default function AdminPanel() {
   const fetchDays = useCallback(
     async (options?: { preserveSelection?: boolean }) => {
       setLoading(true);
+      const loadingToastId = toast.loading(t("admin.updatingData"));
       try {
         const data = await getAllDays();
         setDays(data);
@@ -84,6 +85,7 @@ export default function AdminPanel() {
       } catch {
         toast.error(t("admin.loadingError"));
       } finally {
+        toast.dismiss(loadingToastId);
         setLoading(false);
       }
     },
@@ -254,13 +256,6 @@ export default function AdminPanel() {
         }}
       />
 
-      {loading && days.length > 0 && (
-        <div className="mb-3 text-[10px] uppercase tracking-widest text-text-muted flex items-center gap-2">
-          <div className="w-3 h-3 border border-border border-t-neon-red rounded-full animate-spin" />
-          <span>{t("admin.updatingData")}</span>
-        </div>
-      )}
-
       {/* Admin Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
@@ -311,48 +306,56 @@ export default function AdminPanel() {
         </div>
 
         {creatingDay ? (
-          <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
-            <input
-              type="number"
-              value={newDayNumber === "" ? "" : newDayNumber}
-              onChange={(e) =>
-                setNewDayNumber(
-                  e.target.value === "" ? "" : parseInt(e.target.value, 10) || ""
-                )
-              }
-              className="clip-card-sm w-20 bg-bg-input border border-border px-3 py-2 text-xs text-text-primary focus:border-neon-red focus:outline-none"
-              placeholder="No"
-              min={1}
-            />
-            <input
-              type="text"
-              value={newDayTitleTr}
-              onChange={(e) => setNewDayTitleTr(e.target.value)}
-              className="clip-card-sm bg-bg-input border border-border px-3 py-2 text-xs text-text-primary focus:border-neon-red focus:outline-none min-w-[140px]"
-              placeholder="Başlık (TR)"
-            />
-            <input
-              type="text"
-              value={newDayTitleEn}
-              onChange={(e) => setNewDayTitleEn(e.target.value)}
-              className="clip-card-sm bg-bg-input border border-border px-3 py-2 text-xs text-text-primary focus:border-neon-red focus:outline-none min-w-[140px]"
-              placeholder="Title (EN)"
-            />
-            <input
-              type="text"
-              value={newDaySubtitleTr}
-              onChange={(e) => setNewDaySubtitleTr(e.target.value)}
-              className="clip-card-sm bg-bg-input border border-border px-3 py-2 text-xs text-text-primary focus:border-neon-red focus:outline-none min-w-[160px]"
-              placeholder="Alt başlık (TR, opsiyonel)"
-            />
-            <input
-              type="text"
-              value={newDaySubtitleEn}
-              onChange={(e) => setNewDaySubtitleEn(e.target.value)}
-              className="clip-card-sm bg-bg-input border border-border px-3 py-2 text-xs text-text-primary focus:border-neon-red focus:outline-none min-w-[160px]"
-              placeholder="Subtitle (EN, optional)"
-            />
-            <div className="flex gap-2">
+          <div className="w-full space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-[minmax(0,0.4fr)_minmax(0,1fr)] gap-2">
+              <input
+                type="number"
+                value={newDayNumber === "" ? "" : newDayNumber}
+                onChange={(e) =>
+                  setNewDayNumber(
+                    e.target.value === ""
+                      ? ""
+                      : parseInt(e.target.value, 10) || ""
+                  )
+                }
+                className="clip-card-sm w-full bg-bg-input border border-border px-3 py-2 text-xs text-text-primary focus:border-neon-red focus:outline-none"
+                placeholder="No"
+                min={1}
+              />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <input
+                  type="text"
+                  value={newDayTitleTr}
+                  onChange={(e) => setNewDayTitleTr(e.target.value)}
+                  className="clip-card-sm w-full bg-bg-input border border-border px-3 py-2 text-xs text-text-primary focus:border-neon-red focus:outline-none"
+                  placeholder="Başlık (TR)"
+                />
+                <input
+                  type="text"
+                  value={newDayTitleEn}
+                  onChange={(e) => setNewDayTitleEn(e.target.value)}
+                  className="clip-card-sm w-full bg-bg-input border border-border px-3 py-2 text-xs text-text-primary focus:border-neon-red focus:outline-none"
+                  placeholder="Title (EN)"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <input
+                type="text"
+                value={newDaySubtitleTr}
+                onChange={(e) => setNewDaySubtitleTr(e.target.value)}
+                className="clip-card-sm w-full bg-bg-input border border-border px-3 py-2 text-xs text-text-primary focus:border-neon-red focus:outline-none"
+                placeholder="Alt başlık (TR, opsiyonel)"
+              />
+              <input
+                type="text"
+                value={newDaySubtitleEn}
+                onChange={(e) => setNewDaySubtitleEn(e.target.value)}
+                className="clip-card-sm w-full bg-bg-input border border-border px-3 py-2 text-xs text-text-primary focus:border-neon-red focus:outline-none"
+                placeholder="Subtitle (EN, optional)"
+              />
+            </div>
+            <div className="flex flex-wrap gap-2 justify-end">
               <button
                 onClick={handleCreateDay}
                 className="clip-button bg-neon-red text-white text-[10px] font-bold uppercase tracking-widest px-4 py-2"
