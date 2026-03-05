@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Save, X } from "lucide-react";
 import type { Exercise } from "@/types/workout";
+import { useLanguage } from "@/lib/i18n";
 
 interface ExerciseFormProps {
   exercise?: Exercise | null;
@@ -17,17 +18,22 @@ export default function ExerciseForm({
   onCancel,
   nextOrder,
 }: ExerciseFormProps) {
-  const [name, setName] = useState("");
-  const [muscleGroup, setMuscleGroup] = useState("");
+  const [nameTr, setNameTr] = useState("");
+  const [nameEn, setNameEn] = useState("");
+  const [muscleGroupTr, setMuscleGroupTr] = useState("");
+  const [muscleGroupEn, setMuscleGroupEn] = useState("");
   const [sets, setSets] = useState(3);
   const [reps, setReps] = useState("12");
   const [youtubeVideoId, setYoutubeVideoId] = useState("");
   const [order, setOrder] = useState(nextOrder);
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (exercise) {
-      setName(exercise.name);
-      setMuscleGroup(exercise.muscleGroup);
+      setNameTr(exercise.name_tr || exercise.name);
+      setNameEn(exercise.name_en || exercise.name);
+      setMuscleGroupTr(exercise.muscleGroup_tr || exercise.muscleGroup);
+      setMuscleGroupEn(exercise.muscleGroup_en || exercise.muscleGroup);
       setSets(exercise.sets);
       setReps(exercise.reps);
       setYoutubeVideoId(exercise.youtubeVideoId);
@@ -37,25 +43,41 @@ export default function ExerciseForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({ name, muscleGroup, sets, reps, youtubeVideoId, order });
+    const safeNameTr = nameTr.trim();
+    const safeMuscleGroupTr = muscleGroupTr.trim();
+
+    onSave({
+      name: safeNameTr,
+      muscleGroup: safeMuscleGroupTr,
+      name_tr: safeNameTr,
+      name_en: nameEn.trim() || safeNameTr,
+      muscleGroup_tr: safeMuscleGroupTr,
+      muscleGroup_en: muscleGroupEn.trim() || safeMuscleGroupTr,
+      sets,
+      reps,
+      youtubeVideoId,
+      order,
+    });
   };
 
   return (
     <div className="clip-card bg-bg-card border border-neon-red/30 p-6">
       <h3 className="text-sm font-bold uppercase tracking-widest text-neon-red mb-5">
-        {exercise ? "EGZERSİZİ DÜZENLE" : "YENİ EGZERSİZ EKLE"}
+        {exercise
+          ? t("adminExerciseForm.editTitle")
+          : t("adminExerciseForm.newTitle")}
       </h3>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-[10px] uppercase tracking-widest text-text-muted mb-1.5">
-              EGZERSİZ ADI
+              {t("adminExerciseForm.nameTr")}
             </label>
             <input
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={nameTr}
+              onChange={(e) => setNameTr(e.target.value)}
               className="clip-card-sm w-full bg-bg-input border border-border px-3 py-2.5 text-sm text-text-primary focus:border-neon-red focus:outline-none transition-colors"
               placeholder="Barbell Row"
               required
@@ -64,12 +86,25 @@ export default function ExerciseForm({
 
           <div>
             <label className="block text-[10px] uppercase tracking-widest text-text-muted mb-1.5">
-              KAS GRUBU
+              {t("adminExerciseForm.nameEn")}
             </label>
             <input
               type="text"
-              value={muscleGroup}
-              onChange={(e) => setMuscleGroup(e.target.value)}
+              value={nameEn}
+              onChange={(e) => setNameEn(e.target.value)}
+              className="clip-card-sm w-full bg-bg-input border border-border px-3 py-2.5 text-sm text-text-primary focus:border-neon-red focus:outline-none transition-colors"
+              placeholder="Barbell Row"
+            />
+          </div>
+
+          <div>
+            <label className="block text-[10px] uppercase tracking-widest text-text-muted mb-1.5">
+              {t("adminExerciseForm.muscleGroupTr")}
+            </label>
+            <input
+              type="text"
+              value={muscleGroupTr}
+              onChange={(e) => setMuscleGroupTr(e.target.value)}
               className="clip-card-sm w-full bg-bg-input border border-border px-3 py-2.5 text-sm text-text-primary focus:border-neon-red focus:outline-none transition-colors"
               placeholder="Sırt"
               required
@@ -78,7 +113,20 @@ export default function ExerciseForm({
 
           <div>
             <label className="block text-[10px] uppercase tracking-widest text-text-muted mb-1.5">
-              SET SAYISI
+              {t("adminExerciseForm.muscleGroupEn")}
+            </label>
+            <input
+              type="text"
+              value={muscleGroupEn}
+              onChange={(e) => setMuscleGroupEn(e.target.value)}
+              className="clip-card-sm w-full bg-bg-input border border-border px-3 py-2.5 text-sm text-text-primary focus:border-neon-red focus:outline-none transition-colors"
+              placeholder="Back"
+            />
+          </div>
+
+          <div>
+            <label className="block text-[10px] uppercase tracking-widest text-text-muted mb-1.5">
+              {t("adminExerciseForm.sets")}
             </label>
             <input
               type="number"
@@ -92,7 +140,7 @@ export default function ExerciseForm({
 
           <div>
             <label className="block text-[10px] uppercase tracking-widest text-text-muted mb-1.5">
-              TEKRAR
+              {t("adminExerciseForm.reps")}
             </label>
             <input
               type="text"
@@ -106,7 +154,7 @@ export default function ExerciseForm({
 
           <div>
             <label className="block text-[10px] uppercase tracking-widest text-text-muted mb-1.5">
-              YOUTUBE VİDEO ID
+              {t("adminExerciseForm.youtubeId")}
             </label>
             <input
               type="text"
@@ -119,7 +167,7 @@ export default function ExerciseForm({
 
           <div>
             <label className="block text-[10px] uppercase tracking-widest text-text-muted mb-1.5">
-              SIRA
+              {t("adminExerciseForm.order")}
             </label>
             <input
               type="number"
@@ -138,7 +186,7 @@ export default function ExerciseForm({
             className="clip-button bg-neon-red hover:bg-neon-red-bright text-white font-bold uppercase tracking-widest px-6 py-2.5 text-sm transition-all duration-300 flex items-center gap-2"
           >
             <Save size={16} />
-            KAYDET
+            {t("adminExerciseForm.save")}
           </button>
           <button
             type="button"
@@ -146,7 +194,7 @@ export default function ExerciseForm({
             className="clip-button bg-bg-card-hover border border-border text-text-secondary hover:text-text-primary font-bold uppercase tracking-widest px-6 py-2.5 text-sm transition-all duration-300 flex items-center gap-2"
           >
             <X size={16} />
-            İPTAL
+            {t("adminExerciseForm.cancel")}
           </button>
         </div>
       </form>

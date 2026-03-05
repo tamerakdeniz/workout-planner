@@ -7,6 +7,7 @@ import ExerciseCard from "./ExerciseCard";
 import { getAllDays } from "@/lib/firestore";
 import type { DayProgram, CompletionStatus } from "@/types/workout";
 import { Loader2 } from "lucide-react";
+import { useLanguage } from "@/lib/i18n";
 
 export default function WorkoutView() {
   const [days, setDays] = useState<DayProgram[]>([]);
@@ -14,6 +15,7 @@ export default function WorkoutView() {
   const [completions, setCompletions] = useState<Record<number, CompletionStatus>>({});
   const [loading, setLoading] = useState(true);
   const [showResetAllConfirm, setShowResetAllConfirm] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     async function fetchDays() {
@@ -84,7 +86,7 @@ export default function WorkoutView() {
         <div className="flex flex-col items-center gap-4">
           <Loader2 size={40} className="animate-spin text-neon-red" />
           <p className="text-xs uppercase tracking-widest text-text-muted">
-            PROGRAM YÜKLENİYOR
+            {t("workout.loading")}
           </p>
         </div>
       </div>
@@ -96,11 +98,10 @@ export default function WorkoutView() {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="clip-card bg-bg-card border border-border p-8 text-center max-w-md">
           <p className="text-lg font-bold uppercase tracking-wider text-text-primary mb-2">
-            PROGRAM BULUNAMADI
+            {t("workout.emptyTitle")}
           </p>
           <p className="text-sm text-text-secondary">
-            Firestore&apos;da henüz antrenman verisi yok. Admin panelinden veya
-            seed script ile veri ekleyin.
+            {t("workout.emptyBody")}
           </p>
         </div>
       </div>
@@ -139,11 +140,10 @@ export default function WorkoutView() {
             <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
               <div className="clip-card bg-bg-card border border-border max-w-sm w-full p-6 shadow-[0_0_40px_rgba(0,0,0,0.7)]">
                 <h3 className="text-sm font-bold uppercase tracking-widest text-neon-red mb-2">
-                  PROGRAMI SIFIRLA
+                  {t("workout.resetAllTitle")}
                 </h3>
                 <p className="text-xs text-text-secondary mb-5">
-                  Tüm günlerin ilerlemesini sıfırlamak istediğinizden emin
-                  misiniz? Bu işlem geri alınamaz.
+                  {t("workout.resetAllBody")}
                 </p>
                 <div className="flex justify-end gap-2">
                   <button
@@ -151,14 +151,14 @@ export default function WorkoutView() {
                     onClick={() => setShowResetAllConfirm(false)}
                     className="clip-button bg-bg-card-hover border border-border text-[10px] font-bold uppercase tracking-widest px-4 py-2 text-text-secondary hover:text-text-primary hover:border-text-muted transition-all duration-300"
                   >
-                    İPTAL
+                    {t("common.cancel")}
                   </button>
                   <button
                     type="button"
                     onClick={handleResetAllConfirm}
                     className="clip-button bg-neon-red border border-neon-red text-[10px] font-bold uppercase tracking-widest px-4 py-2 text-white hover:bg-neon-red-bright transition-all duration-300"
                   >
-                    EVET, SIFIRLA
+                    {t("common.yesReset")}
                   </button>
                 </div>
               </div>

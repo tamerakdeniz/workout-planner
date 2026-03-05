@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { Check, Dumbbell, RotateCcw } from "lucide-react";
 import type { Exercise } from "@/types/workout";
+import { useLanguage } from "@/lib/i18n";
 
 interface ExerciseCardProps {
   exercise: Exercise;
@@ -17,6 +18,17 @@ export default function ExerciseCard({
   onToggleComplete,
 }: ExerciseCardProps) {
   const [showVideo, setShowVideo] = useState(false);
+  const { lang, t } = useLanguage();
+
+  const displayMuscleGroup =
+    lang === "tr"
+      ? exercise.muscleGroup_tr || exercise.muscleGroup
+      : exercise.muscleGroup_en || exercise.muscleGroup;
+
+  const displayName =
+    lang === "tr"
+      ? exercise.name_tr || exercise.name
+      : exercise.name_en || exercise.name;
 
   return (
     <div
@@ -51,7 +63,7 @@ export default function ExerciseCard({
                   ${isCompleted ? "text-poison-green" : "text-neon-red"}
                 `}
               >
-                {exercise.muscleGroup}
+                {displayMuscleGroup}
               </span>
             </div>
             <h3
@@ -59,7 +71,7 @@ export default function ExerciseCard({
                 ${isCompleted ? "text-text-secondary line-through" : "text-text-primary"}
               `}
             >
-              {exercise.name}
+              {displayName}
             </h3>
           </div>
 
@@ -83,7 +95,7 @@ export default function ExerciseCard({
         <div className="flex gap-4 mb-5">
           <div className="clip-card-sm bg-bg-primary border border-border px-4 py-2">
             <span className="text-[10px] uppercase tracking-widest text-text-muted block">
-              SET
+              {t("exerciseCard.sets")}
             </span>
             <span
               className={`text-xl font-bold ${isCompleted ? "text-poison-green" : "text-text-primary"}`}
@@ -93,7 +105,7 @@ export default function ExerciseCard({
           </div>
           <div className="clip-card-sm bg-bg-primary border border-border px-4 py-2">
             <span className="text-[10px] uppercase tracking-widest text-text-muted block">
-              TEKRAR
+              {t("exerciseCard.reps")}
             </span>
             <span
               className={`text-xl font-bold ${isCompleted ? "text-poison-green" : "text-text-primary"}`}
@@ -130,7 +142,7 @@ export default function ExerciseCard({
                   </div>
                 </div>
                 <div className="absolute bottom-2 left-3 text-[10px] uppercase tracking-widest text-white/70">
-                  VİDEOYU İZLE
+                  {t("exerciseCard.watchVideo")}
                 </div>
               </button>
             ) : (

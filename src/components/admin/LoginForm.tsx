@@ -4,6 +4,7 @@ import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { getFirebaseAuth } from "@/lib/firebase";
 import { LogIn, Loader2, Shield } from "lucide-react";
+import { useLanguage } from "@/lib/i18n";
 
 interface LoginFormProps {
   onSuccess: () => void;
@@ -14,6 +15,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const { t } = useLanguage();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,7 +26,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
       await signInWithEmailAndPassword(getFirebaseAuth(), email, password);
       onSuccess();
     } catch {
-      setError("Geçersiz e-posta veya şifre.");
+      setError(t("adminLogin.invalidCredentials"));
     } finally {
       setLoading(false);
     }
@@ -39,10 +41,10 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
           </div>
           <div>
             <h2 className="text-xl font-bold uppercase tracking-wider">
-              ADMİN GİRİŞİ
+              {t("adminLogin.title")}
             </h2>
             <p className="text-[10px] uppercase tracking-[0.2em] text-text-muted">
-              YETKİLENDİRİLMİŞ ERİŞİM
+              {t("adminLogin.subtitle")}
             </p>
           </div>
         </div>
@@ -50,7 +52,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label className="block text-[10px] uppercase tracking-widest text-text-muted mb-2">
-              E-POSTA
+              {t("adminLogin.email")}
             </label>
             <input
               type="email"
@@ -64,7 +66,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
 
           <div>
             <label className="block text-[10px] uppercase tracking-widest text-text-muted mb-2">
-              ŞİFRE
+              {t("adminLogin.password")}
             </label>
             <input
               type="password"
@@ -92,7 +94,9 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
             ) : (
               <LogIn size={18} />
             )}
-            {loading ? "GİRİŞ YAPILIYOR..." : "GİRİŞ YAP"}
+            {loading
+              ? t("adminLogin.loggingIn")
+              : t("adminLogin.login")}
           </button>
         </form>
       </div>

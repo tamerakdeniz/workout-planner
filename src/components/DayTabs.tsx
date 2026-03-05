@@ -1,6 +1,7 @@
 "use client";
 
 import type { DayProgram } from "@/types/workout";
+import { useLanguage } from "@/lib/i18n";
 
 interface DayTabsProps {
   days: DayProgram[];
@@ -17,6 +18,8 @@ const DAY_LABELS: Record<number, string> = {
 };
 
 export default function DayTabs({ days, activeDay, onDayChange }: DayTabsProps) {
+  const { lang, t } = useLanguage();
+
   return (
     <div className="flex gap-1 sm:gap-2 overflow-x-auto pb-2 scrollbar-hide">
       {days.map((day) => {
@@ -37,7 +40,10 @@ export default function DayTabs({ days, activeDay, onDayChange }: DayTabsProps) 
             `}
           >
             <span className="relative z-10">
-              {DAY_LABELS[day.dayNumber] || `GÜN ${day.dayNumber}`}
+              {lang === "tr"
+                ? DAY_LABELS[day.dayNumber] ||
+                  `${t("workout.dayLabel")} ${day.dayNumber}`
+                : `${t("workout.dayLabel")} ${day.dayNumber}`}
             </span>
             {isActive && (
               <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-neon-red-bright" />

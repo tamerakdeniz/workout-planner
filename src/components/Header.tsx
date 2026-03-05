@@ -2,8 +2,11 @@
 
 import Link from "next/link";
 import { Flame } from "lucide-react";
+import { useLanguage } from "@/lib/i18n";
 
 export default function Header() {
+  const { lang, setLang, t } = useLanguage();
+
   return (
     <header className="border-b border-border bg-bg-primary/80 backdrop-blur-md sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
@@ -13,10 +16,10 @@ export default function Header() {
           </div>
           <div>
             <h1 className="text-lg sm:text-xl font-bold uppercase tracking-[0.15em] text-text-primary">
-              ANTRENMAN
+              {t("header.titleMain")}
             </h1>
             <p className="text-[9px] uppercase tracking-[0.3em] text-text-muted -mt-0.5">
-              PROGRAMI
+              {t("header.titleSub")}
             </p>
           </div>
         </Link>
@@ -24,18 +27,39 @@ export default function Header() {
         <div className="flex items-center gap-3">
           <div className="hidden sm:block text-right mr-2">
             <p className="text-[10px] uppercase tracking-widest text-text-muted">
-              ESNEK GÜN DÖNGÜSÜ
+              {t("header.flexibleCycle")}
             </p>
+          </div>
+          <div className="flex items-center gap-1 text-[10px] uppercase tracking-widest text-text-secondary border border-border clip-button bg-bg-card-hover px-2 py-1">
+            <button
+              type="button"
+              onClick={() => setLang("tr")}
+              className={`px-1 ${
+                lang === "tr" ? "text-neon-red font-bold" : "text-text-secondary"
+              }`}
+            >
+              TR
+            </button>
+            <span className="text-text-muted">/</span>
+            <button
+              type="button"
+              onClick={() => setLang("en")}
+              className={`px-1 ${
+                lang === "en" ? "text-neon-red font-bold" : "text-text-secondary"
+              }`}
+            >
+              EN
+            </button>
           </div>
           <Link
             href="/admin"
             className="clip-button bg-bg-card-hover border border-border px-3 py-1.5 text-[10px] uppercase tracking-widest font-bold text-text-secondary hover:text-neon-red hover:border-neon-red transition-all duration-300"
           >
-            ADMİN PANEL
+            {t("header.adminPanel")}
           </Link>
           <div className="clip-card-sm bg-bg-card border border-border px-3 py-1.5">
             <span className="text-[10px] uppercase tracking-widest text-neon-red font-bold">
-              AKTİF
+              {t("header.active")}
             </span>
           </div>
         </div>

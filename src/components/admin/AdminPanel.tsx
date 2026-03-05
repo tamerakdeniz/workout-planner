@@ -28,9 +28,11 @@ import {
 } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/lib/i18n";
 
 export default function AdminPanel() {
   const router = useRouter();
+  const { lang, t } = useLanguage();
   const [user, setUser] = useState<User | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
   const [days, setDays] = useState<DayProgram[]>([]);
@@ -40,12 +42,16 @@ export default function AdminPanel() {
   const [editingExercise, setEditingExercise] = useState<Exercise | null>(null);
   const [expandedDays, setExpandedDays] = useState<Record<string, boolean>>({});
   const [editingDayMeta, setEditingDayMeta] = useState<string | null>(null);
-  const [dayTitle, setDayTitle] = useState("");
-  const [daySubtitle, setDaySubtitle] = useState("");
+  const [dayTitleTr, setDayTitleTr] = useState("");
+  const [dayTitleEn, setDayTitleEn] = useState("");
+  const [daySubtitleTr, setDaySubtitleTr] = useState("");
+  const [daySubtitleEn, setDaySubtitleEn] = useState("");
   const [creatingDay, setCreatingDay] = useState(false);
   const [newDayNumber, setNewDayNumber] = useState<number | "">("");
-  const [newDayTitle, setNewDayTitle] = useState("");
-  const [newDaySubtitle, setNewDaySubtitle] = useState("");
+  const [newDayTitleTr, setNewDayTitleTr] = useState("");
+  const [newDayTitleEn, setNewDayTitleEn] = useState("");
+  const [newDaySubtitleTr, setNewDaySubtitleTr] = useState("");
+  const [newDaySubtitleEn, setNewDaySubtitleEn] = useState("");
   const [pendingDayDelete, setPendingDayDelete] = useState<DayProgram | null>(
     null
   );
@@ -76,12 +82,12 @@ export default function AdminPanel() {
           );
         }
       } catch {
-        toast.error("Veriler yüklenemedi.");
+        toast.error(t("admin.loadingError"));
       } finally {
         setLoading(false);
       }
     },
-    []
+    [t]
   );
 
   useEffect(() => {
@@ -97,31 +103,42 @@ export default function AdminPanel() {
     const maxDayNumber =
       days.length > 0 ? Math.max(...days.map((d) => d.dayNumber)) : 0;
     setNewDayNumber(maxDayNumber + 1);
-    setNewDayTitle("");
-    setNewDaySubtitle("");
+    setNewDayTitleTr("");
+    setNewDayTitleEn("");
+    setNewDaySubtitleTr("");
+    setNewDaySubtitleEn("");
     setCreatingDay(true);
   };
 
   const handleCreateDay = async () => {
-    if (!newDayNumber || !newDayTitle.trim()) {
-      toast.error("Gün numarası ve başlık zorunludur.");
+    if (!newDayNumber || !newDayTitleTr.trim()) {
+      toast.error(t("admin.creatingDayError"));
       return;
     }
 
     try {
+      const titleTr = newDayTitleTr.trim();
+      const subtitleTr = newDaySubtitleTr.trim();
+      const titleEn = newDayTitleEn.trim() || titleTr;
+      const subtitleEn = newDaySubtitleEn.trim() || subtitleTr;
+
       const id = await createDay({
         dayNumber: newDayNumber,
-        title: newDayTitle.trim(),
-        subtitle: newDaySubtitle.trim(),
+        title: titleTr,
+        subtitle: subtitleTr,
+        title_tr: titleTr,
+        title_en: titleEn,
+        subtitle_tr: subtitleTr,
+        subtitle_en: subtitleEn,
         exercises: [],
       });
-      toast.success("Yeni gün oluşturuldu!");
+      toast.success(t("admin.creatingDaySuccess"));
       setCreatingDay(false);
       setSelectedDay(id);
       setExpandedDays((prev) => ({ ...prev, [id]: true }));
       fetchDays({ preserveSelection: true });
     } catch {
-      toast.error("Gün oluşturulurken hata oluştu.");
+      toast.error(t("admin.creatingDayFailed"));
     }
   };
 
@@ -130,7 +147,7 @@ export default function AdminPanel() {
     const dayId = pendingDayDelete.id;
     try {
       await deleteDayDocument(dayId);
-      toast.success("Gün silindi!");
+      toast.success(t("admin.dayDeleted"));
       setExpandedDays((prev) => {
         const copy = { ...prev };
         delete copy[dayId];
@@ -142,7 +159,7 @@ export default function AdminPanel() {
       fetchDays({ preserveSelection: true });
       setPendingDayDelete(null);
     } catch {
-      toast.error("Gün silinirken hata oluştu.");
+      toast.error(t("admin.dayDeleteFailed"));
     }
   };
 
@@ -150,11 +167,11 @@ export default function AdminPanel() {
     if (!selectedDay) return;
     try {
       await addExerciseToDay(selectedDay, data);
-      toast.success("Egzersiz eklendi!");
+      toast.success(t("admin.exerciseAdded"));
       setShowForm(false);
       fetchDays({ preserveSelection: true });
     } catch {
-      toast.error("Egzersiz eklenirken hata oluştu.");
+      toast.error(t("admin.exerciseAddFailed"));
     }
   };
 
@@ -162,12 +179,12 @@ export default function AdminPanel() {
     if (!selectedDay || !editingExercise) return;
     try {
       await updateExerciseInDay(selectedDay, editingExercise.id, data);
-      toast.success("Egzersiz güncellendi!");
+      toast.success(t("admin.exerciseUpdated"));
       setEditingExercise(null);
       setShowForm(false);
       fetchDays({ preserveSelection: true });
     } catch {
-      toast.error("Güncelleme sırasında hata oluştu.");
+      toast.error(t("admin.exerciseUpdateFailed"));
     }
   };
 
@@ -176,22 +193,34 @@ export default function AdminPanel() {
     const { dayId, exercise } = pendingExerciseDelete;
     try {
       await deleteExerciseFromDay(dayId, exercise.id);
-      toast.success("Egzersiz silindi!");
+      toast.success(t("admin.exerciseDeleted"));
       fetchDays({ preserveSelection: true });
       setPendingExerciseDelete(null);
     } catch {
-      toast.error("Silme sırasında hata oluştu.");
+      toast.error(t("admin.exerciseDeleteFailed"));
     }
   };
 
   const handleUpdateDayMeta = async (dayId: string) => {
     try {
-      await updateDay(dayId, { title: dayTitle, subtitle: daySubtitle });
-      toast.success("Gün bilgileri güncellendi!");
+      const titleTr = dayTitleTr;
+      const subtitleTr = daySubtitleTr;
+      const titleEn = dayTitleEn.trim() || titleTr;
+      const subtitleEn = daySubtitleEn.trim() || subtitleTr;
+
+      await updateDay(dayId, {
+        title: titleTr,
+        subtitle: subtitleTr,
+        title_tr: titleTr,
+        title_en: titleEn,
+        subtitle_tr: subtitleTr,
+        subtitle_en: subtitleEn,
+      });
+      toast.success(t("admin.dayMetaUpdated"));
       setEditingDayMeta(null);
       fetchDays({ preserveSelection: true });
     } catch {
-      toast.error("Güncelleme başarısız.");
+      toast.error(t("admin.dayMetaUpdateFailed"));
     }
   };
 
@@ -228,7 +257,7 @@ export default function AdminPanel() {
       {loading && days.length > 0 && (
         <div className="mb-3 text-[10px] uppercase tracking-widest text-text-muted flex items-center gap-2">
           <div className="w-3 h-3 border border-border border-t-neon-red rounded-full animate-spin" />
-          <span>Veriler güncelleniyor…</span>
+          <span>{t("admin.updatingData")}</span>
         </div>
       )}
 
@@ -240,10 +269,10 @@ export default function AdminPanel() {
           </div>
           <div>
             <h1 className="text-xl sm:text-2xl font-bold uppercase tracking-wider">
-              ADMİN PANELİ
+              {t("admin.adminPanelTitle")}
             </h1>
             <p className="text-[10px] uppercase tracking-[0.2em] text-text-muted">
-              ANTRENMAN YÖNETİMİ
+              {t("admin.adminPanelSubtitle")}
             </p>
           </div>
         </div>
@@ -254,14 +283,14 @@ export default function AdminPanel() {
             className="clip-button bg-bg-card border border-border px-4 py-2 text-sm text-text-secondary hover:text-text-primary hover:border-neon-red/60 transition-all duration-300 flex items-center gap-2 uppercase tracking-wider font-bold"
           >
             <Home size={16} />
-            ANA SAYFA
+            {t("admin.goHome")}
           </button>
           <button
             onClick={handleLogout}
             className="clip-button bg-bg-card border border-border px-4 py-2 text-sm text-text-secondary hover:text-neon-red hover:border-neon-red transition-all duration-300 flex items-center gap-2 uppercase tracking-wider font-bold"
           >
             <LogOut size={16} />
-            ÇIKIŞ
+            {t("admin.logout")}
           </button>
         </div>
       </div>
@@ -270,14 +299,14 @@ export default function AdminPanel() {
       <div className="clip-card bg-bg-card border border-border mb-6 p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-[10px] uppercase tracking-widest text-text-muted">
-            GÜN YÖNETİMİ
+            {t("admin.dayManagement")}
           </p>
           <p className="text-xs text-text-secondary">
-            Toplam{" "}
+            {t("admin.totalDaysPrefix")}{" "}
             <span className="font-semibold text-text-primary">
               {days.length}
             </span>{" "}
-            gün tanımlı.
+            {t("admin.totalDaysSuffix")}
           </p>
         </div>
 
@@ -297,30 +326,44 @@ export default function AdminPanel() {
             />
             <input
               type="text"
-              value={newDayTitle}
-              onChange={(e) => setNewDayTitle(e.target.value)}
+              value={newDayTitleTr}
+              onChange={(e) => setNewDayTitleTr(e.target.value)}
               className="clip-card-sm bg-bg-input border border-border px-3 py-2 text-xs text-text-primary focus:border-neon-red focus:outline-none min-w-[140px]"
-              placeholder="Başlık"
+              placeholder="Başlık (TR)"
             />
             <input
               type="text"
-              value={newDaySubtitle}
-              onChange={(e) => setNewDaySubtitle(e.target.value)}
+              value={newDayTitleEn}
+              onChange={(e) => setNewDayTitleEn(e.target.value)}
+              className="clip-card-sm bg-bg-input border border-border px-3 py-2 text-xs text-text-primary focus:border-neon-red focus:outline-none min-w-[140px]"
+              placeholder="Title (EN)"
+            />
+            <input
+              type="text"
+              value={newDaySubtitleTr}
+              onChange={(e) => setNewDaySubtitleTr(e.target.value)}
               className="clip-card-sm bg-bg-input border border-border px-3 py-2 text-xs text-text-primary focus:border-neon-red focus:outline-none min-w-[160px]"
-              placeholder="Alt başlık (opsiyonel)"
+              placeholder="Alt başlık (TR, opsiyonel)"
+            />
+            <input
+              type="text"
+              value={newDaySubtitleEn}
+              onChange={(e) => setNewDaySubtitleEn(e.target.value)}
+              className="clip-card-sm bg-bg-input border border-border px-3 py-2 text-xs text-text-primary focus:border-neon-red focus:outline-none min-w-[160px]"
+              placeholder="Subtitle (EN, optional)"
             />
             <div className="flex gap-2">
               <button
                 onClick={handleCreateDay}
                 className="clip-button bg-neon-red text-white text-[10px] font-bold uppercase tracking-widest px-4 py-2"
               >
-                OLUŞTUR
+                {t("admin.create")}
               </button>
               <button
                 onClick={() => setCreatingDay(false)}
                 className="clip-button bg-bg-card-hover border border-border text-[10px] font-bold uppercase tracking-widest px-4 py-2 text-text-secondary hover:text-text-primary"
               >
-                İPTAL
+                {t("common.cancel")}
               </button>
             </div>
           </div>
@@ -330,7 +373,7 @@ export default function AdminPanel() {
             className="clip-button bg-bg-card-hover border border-dashed border-border px-4 py-2 text-[10px] uppercase tracking-widest font-bold text-text-muted hover:text-neon-red hover:border-neon-red transition-all duration-300 flex items-center gap-2 self-start sm:self-auto"
           >
             <Plus size={14} />
-            YENİ GÜN EKLE
+                {t("admin.newDay")}
           </button>
         )}
       </div>
@@ -353,14 +396,19 @@ export default function AdminPanel() {
               >
                 <div className="flex items-center gap-3">
                   <span className="clip-button bg-neon-red text-white text-xs font-bold px-3 py-1.5 uppercase">
-                    GÜN {day.dayNumber}
+                    {t("workout.dayLabel")} {day.dayNumber}
                   </span>
                   <div className="text-left">
                     <h3 className="font-bold uppercase tracking-wider text-sm">
-                      {day.title}
+                      {lang === "tr"
+                        ? day.title_tr || day.title
+                        : day.title_en || day.title}
                     </h3>
                     <p className="text-[10px] uppercase tracking-widest text-text-muted">
-                      {day.subtitle} • {day.exercises.length} EGZERSİZ
+                      {lang === "tr"
+                        ? day.subtitle_tr || day.subtitle
+                        : day.subtitle_en || day.subtitle}{" "}
+                      • {day.exercises.length} {t("admin.exercisesCountSuffix")}
                     </p>
                   </div>
                 </div>
@@ -380,21 +428,43 @@ export default function AdminPanel() {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                           <label className="block text-[10px] uppercase tracking-widest text-text-muted mb-1">
-                            BAŞLIK
+                            {t("admin.dayTitleTrLabel")}
                           </label>
                           <input
-                            value={dayTitle}
-                            onChange={(e) => setDayTitle(e.target.value)}
+                            value={dayTitleTr}
+                            onChange={(e) => setDayTitleTr(e.target.value)}
                             className="clip-card-sm w-full bg-bg-input border border-border px-3 py-2 text-sm text-text-primary focus:border-neon-red focus:outline-none"
                           />
                         </div>
                         <div>
                           <label className="block text-[10px] uppercase tracking-widest text-text-muted mb-1">
-                            ALT BAŞLIK
+                            {t("admin.daySubtitleTrLabel")}
                           </label>
                           <input
-                            value={daySubtitle}
-                            onChange={(e) => setDaySubtitle(e.target.value)}
+                            value={daySubtitleTr}
+                            onChange={(e) => setDaySubtitleTr(e.target.value)}
+                            className="clip-card-sm w-full bg-bg-input border border-border px-3 py-2 text-sm text-text-primary focus:border-neon-red focus:outline-none"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[10px] uppercase tracking-widest text-text-muted mb-1">
+                            {t("admin.dayTitleEnLabel")}
+                          </label>
+                          <input
+                            value={dayTitleEn}
+                            onChange={(e) => setDayTitleEn(e.target.value)}
+                            className="clip-card-sm w-full bg-bg-input border border-border px-3 py-2 text-sm text-text-primary focus:border-neon-red focus:outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] uppercase tracking-widest text-text-muted mb-1">
+                            {t("admin.daySubtitleEnLabel")}
+                          </label>
+                          <input
+                            value={daySubtitleEn}
+                            onChange={(e) => setDaySubtitleEn(e.target.value)}
                             className="clip-card-sm w-full bg-bg-input border border-border px-3 py-2 text-sm text-text-primary focus:border-neon-red focus:outline-none"
                           />
                         </div>
@@ -404,13 +474,13 @@ export default function AdminPanel() {
                           onClick={() => handleUpdateDayMeta(day.id)}
                           className="clip-button bg-neon-red text-white text-xs font-bold uppercase tracking-widest px-4 py-2"
                         >
-                          KAYDET
+                          {t("common.save")}
                         </button>
                         <button
                           onClick={() => setEditingDayMeta(null)}
                           className="clip-button bg-bg-card-hover border border-border text-text-secondary text-xs font-bold uppercase tracking-widest px-4 py-2"
                         >
-                          İPTAL
+                          {t("common.cancel")}
                         </button>
                       </div>
                     </div>
@@ -418,12 +488,14 @@ export default function AdminPanel() {
                     <button
                       onClick={() => {
                         setEditingDayMeta(day.id);
-                        setDayTitle(day.title);
-                        setDaySubtitle(day.subtitle);
+                        setDayTitleTr(day.title_tr || day.title);
+                        setDayTitleEn(day.title_en || "");
+                        setDaySubtitleTr(day.subtitle_tr || day.subtitle);
+                        setDaySubtitleEn(day.subtitle_en || "");
                       }}
                       className="text-[10px] uppercase tracking-widest text-text-muted hover:text-neon-red transition-colors flex items-center gap-1"
                     >
-                      <Pencil size={10} /> GÜN BİLGİLERİNİ DÜZENLE
+                      <Pencil size={10} /> {t("admin.editingDayInfo")}
                     </button>
                   )}
 
@@ -442,14 +514,19 @@ export default function AdminPanel() {
                                 #{exercise.order}
                               </span>
                               <h4 className="font-bold text-sm uppercase tracking-wider">
-                                {exercise.name}
+                                {lang === "tr"
+                                  ? exercise.name_tr || exercise.name
+                                  : exercise.name_en || exercise.name}
                               </h4>
                             </div>
                             <p className="text-[10px] uppercase tracking-widest text-text-muted mt-0.5">
-                              {exercise.muscleGroup} • {exercise.sets} SET ×{" "}
-                              {exercise.reps} TEKRAR
+                              {lang === "tr"
+                                ? exercise.muscleGroup_tr || exercise.muscleGroup
+                                : exercise.muscleGroup_en || exercise.muscleGroup}{" "}
+                              • {exercise.sets} {t("exerciseCard.sets")} ×{" "}
+                              {exercise.reps} {t("exerciseCard.reps")}
                               {exercise.youtubeVideoId &&
-                                ` • VİDEO: ${exercise.youtubeVideoId}`}
+                                ` • ID: ${exercise.youtubeVideoId}`}
                             </p>
                           </div>
                           <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -524,15 +601,15 @@ export default function AdminPanel() {
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
           <div className="clip-card bg-bg-card border border-border max-w-sm w-full p-6 shadow-[0_0_40px_rgba(0,0,0,0.7)]">
             <h3 className="text-sm font-bold uppercase tracking-widest text-neon-red mb-2">
-              GÜNÜ SİL
+              {t("admin.confirmDeleteDayTitle")}
             </h3>
             <p className="text-xs text-text-secondary mb-4">
-              Gün {pendingDayDelete.dayNumber} - "
+              {t("admin.confirmDeleteDayBodyPrefix")}{" "}
+              {pendingDayDelete.dayNumber} - "
               <span className="text-text-primary">
                 {pendingDayDelete.title}
               </span>
-              " tamamen silinecek. Bu işleme bağlı tüm egzersizler de
-              kaybolacak. Devam etmek istiyor musunuz?
+              " {t("admin.confirmDeleteDayBodyMiddle")}
             </p>
             <div className="flex justify-end gap-2">
               <button
@@ -540,14 +617,14 @@ export default function AdminPanel() {
                 onClick={() => setPendingDayDelete(null)}
                 className="clip-button bg-bg-card-hover border border-border text-[10px] font-bold uppercase tracking-widest px-4 py-2 text-text-secondary hover:text-text-primary hover:border-text-muted transition-all duration-300"
               >
-                İPTAL
+                {t("common.cancel")}
               </button>
               <button
                 type="button"
                 onClick={handleDeleteDay}
                 className="clip-button bg-neon-red border border-neon-red text-[10px] font-bold uppercase tracking-widest px-4 py-2 text-white hover:bg-neon-red-bright transition-all duration-300"
               >
-                EVET, SİL
+                {t("common.yesDelete")}
               </button>
             </div>
           </div>
@@ -559,10 +636,10 @@ export default function AdminPanel() {
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
           <div className="clip-card bg-bg-card border border-border max-w-sm w-full p-6 shadow-[0_0_40px_rgba(0,0,0,0.7)]">
             <h3 className="text-sm font-bold uppercase tracking-widest text-neon-red mb-2">
-              EGZERSİZİ SİL
+              {t("admin.confirmDeleteExerciseTitle")}
             </h3>
             <p className="text-xs text-text-secondary mb-1">
-              Aşağıdaki egzersiz silinecek:
+              {t("admin.confirmDeleteExerciseBody")}
             </p>
             <p className="text-xs text-text-primary font-semibold mb-4">
               {pendingExerciseDelete.exercise.name} •{" "}
@@ -574,14 +651,14 @@ export default function AdminPanel() {
                 onClick={() => setPendingExerciseDelete(null)}
                 className="clip-button bg-bg-card-hover border border-border text-[10px] font-bold uppercase tracking-widest px-4 py-2 text-text-secondary hover:text-text-primary hover:border-text-muted transition-all duration-300"
               >
-                İPTAL
+                {t("common.cancel")}
               </button>
               <button
                 type="button"
                 onClick={handleDeleteExercise}
                 className="clip-button bg-neon-red border border-neon-red text-[10px] font-bold uppercase tracking-widest px-4 py-2 text-white hover:bg-neon-red-bright transition-all duration-300"
               >
-                EVET, SİL
+                {t("common.yesDelete")}
               </button>
             </div>
           </div>
