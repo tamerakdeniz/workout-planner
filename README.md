@@ -1,8 +1,8 @@
-# gym-schedule
+# Workout Planner – Egzersiz Planlayıcı - Antrenman Programı Yönetimi
 
 - Demo URL: https://gym.wxcodesign.com
 
-A small **Next.js + Firebase** app for managing a gym training schedule (days, exercises, YouTube demo links, etc.).
+**Workout Planner** (Egzersiz Planlayıcı - Antrenman Programı Yönetimi) is a web application built with **Next.js + Firebase** to track gym workouts and simplify program management for trainers. Users can view exercises by selecting a program and day (with set/rep info and YouTube demo videos) and mark exercises as completed. Coaches can log in via the admin panel using Firebase Auth to create, edit, and delete programs, days, and exercises.
 
 The project is set up to be **safe to host on GitHub**: real secrets live only in local env files that are already ignored by Git.
 

@@ -10,9 +10,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Antrenman Programı | Gym Schedule",
+  title: "Workout Planner | Egzersiz Planlayıcı - Antrenman Programı Yönetimi",
   description:
-    "Kişisel 5 günlük antrenman takip uygulaması / Personal 5-day workout tracking app",
+    "Workout Planner – Egzersiz Planlayıcı: Antrenman programlarını yönetin, egzersizleri takip edin. / Track gym workouts and manage training programs.",
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },

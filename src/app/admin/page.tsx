@@ -2,7 +2,7 @@ import ClientAdminPanel from "@/components/admin/ClientAdminPanel";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Admin | Antrenman Programı",
+  title: "Admin | Workout Planner – Egzersiz Planlayıcı",
   robots: "noindex, nofollow",
 };
 

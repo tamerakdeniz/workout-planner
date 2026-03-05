@@ -33,9 +33,9 @@
        backToHome: "ANA SAYFAYA DÖN",
      },
      header: {
-       titleMain: "ANTRENMAN",
-       titleSub: "PROGRAMI",
-       flexibleCycle: "ESNEK GÜN DÖNGÜSÜ",
+       titleMain: "EGZERSİZ",
+       titleSub: "PLANLAYICI",
+       flexibleCycle: "ANTRENMAN PROGRAMI YÖNETİMİ",
        adminPanel: "ADMİN PANEL",
      },
     workout: {
@@ -54,7 +54,7 @@
       backToPrograms: "PROGRAMLARA DÖN",
     },
     programs: {
-      title: "ANTRENMAN PROGRAMLARI",
+      title: "EGZERSİZ PLANLAYICI – ANTRENMAN PROGRAMLARI",
       subtitle: "PROGRAMINI SEÇ",
       empty: "Henüz program oluşturulmamış. Admin panelinden yeni program ekleyin.",
       days: "GÜN",
@@ -68,7 +68,7 @@
      },
      admin: {
        adminPanelTitle: "ADMİN PANELİ",
-       adminPanelSubtitle: "ANTRENMAN YÖNETİMİ",
+       adminPanelSubtitle: "EGZERSİZ PLANLAYICI – ANTRENMAN YÖNETİMİ",
        goHome: "ANA SAYFA",
        logout: "ÇIKIŞ",
       programManagement: "PROGRAM YÖNETİMİ",
@@ -177,8 +177,8 @@
      },
      header: {
        titleMain: "WORKOUT",
-       titleSub: "PROGRAM",
-       flexibleCycle: "FLEXIBLE DAY CYCLE",
+       titleSub: "PLANNER",
+       flexibleCycle: "EXERCISE PLANNER – WORKOUT PROGRAM MANAGEMENT",
        adminPanel: "ADMIN PANEL",
      },
     workout: {
@@ -197,7 +197,7 @@
       backToPrograms: "BACK TO PROGRAMS",
     },
     programs: {
-      title: "WORKOUT PROGRAMS",
+      title: "WORKOUT PLANNER – PROGRAMS",
       subtitle: "SELECT YOUR PROGRAM",
       empty: "No programs yet. Add a new program from the admin panel.",
       days: "DAYS",
@@ -211,7 +211,7 @@
      },
      admin: {
        adminPanelTitle: "ADMIN PANEL",
-       adminPanelSubtitle: "WORKOUT MANAGEMENT",
+       adminPanelSubtitle: "WORKOUT PLANNER – PROGRAM MANAGEMENT",
        goHome: "HOME",
        logout: "LOG OUT",
       programManagement: "PROGRAM MANAGEMENT",
