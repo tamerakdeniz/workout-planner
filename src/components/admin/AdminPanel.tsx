@@ -438,13 +438,13 @@ export default function AdminPanel() {
       />
 
       {/* Admin Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <div className="clip-button bg-neon-red p-2.5">
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <div className="flex items-center gap-3 min-w-0 shrink-0">
+          <div className="clip-button bg-neon-red p-2.5 shrink-0 flex items-center justify-center">
             <Settings size={20} className="text-white" />
           </div>
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold uppercase tracking-wider">
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl font-bold uppercase tracking-wider truncate">
               {t("admin.adminPanelTitle")}
             </h1>
             <p className="text-[10px] uppercase tracking-[0.2em] text-text-muted">
@@ -453,8 +453,8 @@ export default function AdminPanel() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <div className={`clip-card-sm border px-3 py-1.5 flex items-center gap-2 ${
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <div className={`clip-card-sm border px-3 py-1.5 flex items-center gap-2 shrink-0 ${
             firebaseConnected
               ? "bg-poison-green/10 border-poison-green/40"
               : "bg-neon-red/10 border-neon-red/40"
@@ -472,17 +472,17 @@ export default function AdminPanel() {
           </div>
           <button
             onClick={() => router.push("/")}
-            className="clip-button bg-bg-card border border-border px-4 py-2 text-sm text-text-secondary hover:text-text-primary hover:border-neon-red/60 transition-all duration-300 flex items-center gap-2 uppercase tracking-wider font-bold"
+            className="clip-button bg-bg-card border border-border px-3 py-2 sm:px-4 text-xs sm:text-sm text-text-secondary hover:text-text-primary hover:border-neon-red/60 transition-all duration-300 flex items-center gap-2 uppercase tracking-wider font-bold shrink-0"
           >
-            <Home size={16} />
-            {t("admin.goHome")}
+            <Home size={16} className="shrink-0" />
+            <span className="whitespace-nowrap">{t("admin.goHome")}</span>
           </button>
           <button
             onClick={handleLogout}
-            className="clip-button bg-bg-card border border-border px-4 py-2 text-sm text-text-secondary hover:text-neon-red hover:border-neon-red transition-all duration-300 flex items-center gap-2 uppercase tracking-wider font-bold"
+            className="clip-button bg-bg-card border border-border px-3 py-2 sm:px-4 text-xs sm:text-sm text-text-secondary hover:text-neon-red hover:border-neon-red transition-all duration-300 flex items-center gap-2 uppercase tracking-wider font-bold shrink-0"
           >
-            <LogOut size={16} />
-            {t("admin.logout")}
+            <LogOut size={16} className="shrink-0" />
+            <span className="whitespace-nowrap">{t("admin.logout")}</span>
           </button>
         </div>
       </div>

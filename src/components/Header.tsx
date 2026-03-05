@@ -10,8 +10,8 @@ export default function Header() {
 
   return (
     <header className="border-b border-border bg-bg-primary/80 backdrop-blur-md sticky top-0 z-50">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-3 group shrink-0">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-3">
+        <Link href="/" className="flex items-center gap-3 group shrink-0 min-w-0">
           <span className="size-14 flex shrink-0 items-center justify-center overflow-hidden">
             <Image
               src="/img/logo.png"
@@ -22,8 +22,8 @@ export default function Header() {
               priority
             />
           </span>
-          <div>
-            <h1 className="text-lg sm:text-xl font-bold uppercase tracking-[0.15em] text-text-primary">
+          <div className="min-w-0">
+            <h1 className="text-lg sm:text-xl font-bold uppercase tracking-[0.15em] text-text-primary truncate">
               {t("header.titleMain")}
             </h1>
             <p className="text-[9px] uppercase tracking-[0.3em] text-text-muted -mt-0.5">
@@ -32,14 +32,14 @@ export default function Header() {
           </div>
         </Link>
 
-        <div className="flex items-center gap-3">
-          <div className="hidden sm:block text-right mr-2">
+        <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3">
+          <div className="hidden sm:block text-right mr-0 sm:mr-2">
             <p className="text-[10px] uppercase tracking-widest text-text-muted">
               {t("header.flexibleCycle")}
             </p>
           </div>
 
-          <div className="clip-button bg-bg-card-hover border border-border px-3 py-1.5 flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-text-secondary hover:text-neon-red hover:border-neon-red transition-all duration-300">
+          <div className="clip-button bg-bg-card-hover border border-border px-3 py-1.5 flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-text-secondary hover:text-neon-red hover:border-neon-red transition-all duration-300 shrink-0">
             <Languages size={14} className="text-text-muted" />
             <button
               type="button"
@@ -68,7 +68,7 @@ export default function Header() {
 
           <Link
             href="/admin"
-            className="clip-button bg-bg-card-hover border border-border px-3 py-1.5 text-[10px] uppercase tracking-widest font-bold text-text-secondary hover:text-neon-red hover:border-neon-red transition-all duration-300"
+            className="clip-button bg-bg-card-hover border border-border px-3 py-1.5 text-[10px] uppercase tracking-widest font-bold text-text-secondary hover:text-neon-red hover:border-neon-red transition-all duration-300 shrink-0 whitespace-nowrap"
           >
             {t("header.adminPanel")}
           </Link>
