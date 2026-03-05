@@ -75,13 +75,6 @@ export default function AdminPanel() {
       try {
         const data = await getAllDays();
         setDays(data);
-
-        if (!options?.preserveSelection && data.length > 0) {
-          setSelectedDay((prev) => prev || data[0].id);
-          setExpandedDays((prev) =>
-            Object.keys(prev).length ? prev : { [data[0].id]: true }
-          );
-        }
       } catch {
         toast.error(t("admin.loadingError"));
       } finally {
