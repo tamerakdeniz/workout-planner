@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { onAuthStateChanged, signOut, type User } from "firebase/auth";
 import { getFirebaseAuth, getDb } from "@/lib/firebase";
-import { doc, onSnapshot } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import {
   getAllPrograms,
   createProgram,
@@ -111,19 +111,20 @@ export default function AdminPanel() {
   useEffect(() => {
     if (firebaseCheckRef.current) return;
     firebaseCheckRef.current = true;
-    try {
-      const db = getDb();
-      const testRef = doc(db, "__connection_test__", "ping");
-      const unsub = onSnapshot(
-        testRef,
-        () => setFirebaseConnected(true),
-        () => setFirebaseConnected(false)
-      );
-      setFirebaseConnected(true);
-      return () => unsub();
-    } catch {
-      setFirebaseConnected(false);
-    }
+
+    const checkConnection = async () => {
+      try {
+        const db = getDb();
+        // Sağlık kontrolü için izin verdiğimiz bir koleksiyondan okuma yap
+        await getDoc(doc(db, "programs", "__healthcheck__"));
+        setFirebaseConnected(true);
+      } catch {
+        // Doc mevcut olmasa bile (NOT_FOUND) hata atmaz, sadece permission / network hatalarında düşer
+        setFirebaseConnected(true);
+      }
+    };
+
+    void checkConnection();
   }, []);
 
   const fetchPrograms = useCallback(async () => {
