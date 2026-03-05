@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Flame } from "lucide-react";
+import { Flame, Languages } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 
 export default function Header() {
@@ -30,12 +30,16 @@ export default function Header() {
               {t("header.flexibleCycle")}
             </p>
           </div>
-          <div className="flex items-center gap-1 text-[10px] uppercase tracking-widest text-text-secondary border border-border clip-button bg-bg-card-hover px-2 py-1">
+
+          <div className="clip-button bg-bg-card-hover border border-border px-3 py-1.5 flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-text-secondary hover:text-neon-red hover:border-neon-red transition-all duration-300">
+            <Languages size={14} className="text-text-muted" />
             <button
               type="button"
               onClick={() => setLang("tr")}
-              className={`px-1 ${
-                lang === "tr" ? "text-neon-red font-bold" : "text-text-secondary"
+              className={`px-1 transition-colors duration-200 cursor-pointer ${
+                lang === "tr"
+                  ? "text-neon-red"
+                  : "text-text-secondary hover:text-neon-red"
               }`}
             >
               TR
@@ -44,13 +48,16 @@ export default function Header() {
             <button
               type="button"
               onClick={() => setLang("en")}
-              className={`px-1 ${
-                lang === "en" ? "text-neon-red font-bold" : "text-text-secondary"
+              className={`px-1 transition-colors duration-200 cursor-pointer ${
+                lang === "en"
+                  ? "text-neon-red"
+                  : "text-text-secondary hover:text-neon-red"
               }`}
             >
               EN
             </button>
           </div>
+
           <Link
             href="/admin"
             className="clip-button bg-bg-card-hover border border-border px-3 py-1.5 text-[10px] uppercase tracking-widest font-bold text-text-secondary hover:text-neon-red hover:border-neon-red transition-all duration-300"
