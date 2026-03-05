@@ -64,11 +64,6 @@ export default function Header() {
           >
             {t("header.adminPanel")}
           </Link>
-          <div className="clip-card-sm bg-bg-card border border-border px-3 py-1.5">
-            <span className="text-[10px] uppercase tracking-widest text-neon-red font-bold">
-              {t("header.active")}
-            </span>
-          </div>
         </div>
       </div>
     </header>

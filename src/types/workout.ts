@@ -39,6 +39,7 @@ export interface Program {
   icon: ProgramIcon;
   color: ProgramColor;
   order: number;
+  isActive: boolean;
 }
 
 export interface CompletionStatus {

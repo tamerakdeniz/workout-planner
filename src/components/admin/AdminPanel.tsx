@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { onAuthStateChanged, signOut, type User } from "firebase/auth";
-import { getFirebaseAuth } from "@/lib/firebase";
+import { getFirebaseAuth, getDb } from "@/lib/firebase";
+import { doc, onSnapshot } from "firebase/firestore";
 import {
   getAllPrograms,
   createProgram,
@@ -31,6 +32,7 @@ import {
   ChevronUp,
   Settings,
   Home,
+  Power,
 } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import { useRouter } from "next/navigation";
@@ -57,6 +59,7 @@ export default function AdminPanel() {
   const [newProgramIcon, setNewProgramIcon] = useState<ProgramIcon>("dumbbell");
   const [newProgramColor, setNewProgramColor] = useState<ProgramColor>("red");
   const [newProgramOrder, setNewProgramOrder] = useState<number>(1);
+  const [newProgramActive, setNewProgramActive] = useState(true);
 
   const [editingProgramId, setEditingProgramId] = useState<string | null>(null);
   const [editProgramNameTr, setEditProgramNameTr] = useState("");
@@ -66,6 +69,10 @@ export default function AdminPanel() {
   const [editProgramIcon, setEditProgramIcon] = useState<ProgramIcon>("dumbbell");
   const [editProgramColor, setEditProgramColor] = useState<ProgramColor>("red");
   const [editProgramOrder, setEditProgramOrder] = useState<number>(1);
+  const [editProgramActive, setEditProgramActive] = useState(true);
+
+  const [firebaseConnected, setFirebaseConnected] = useState(false);
+  const firebaseCheckRef = useRef(false);
 
   const [pendingProgramDelete, setPendingProgramDelete] = useState<Program | null>(null);
 
@@ -99,6 +106,24 @@ export default function AdminPanel() {
       setAuthChecked(true);
     });
     return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    if (firebaseCheckRef.current) return;
+    firebaseCheckRef.current = true;
+    try {
+      const db = getDb();
+      const testRef = doc(db, "__connection_test__", "ping");
+      const unsub = onSnapshot(
+        testRef,
+        () => setFirebaseConnected(true),
+        () => setFirebaseConnected(false)
+      );
+      setFirebaseConnected(true);
+      return () => unsub();
+    } catch {
+      setFirebaseConnected(false);
+    }
   }, []);
 
   const fetchPrograms = useCallback(async () => {
@@ -152,6 +177,7 @@ export default function AdminPanel() {
     setNewProgramDescEn("");
     setNewProgramIcon("dumbbell");
     setNewProgramColor("red");
+    setNewProgramActive(true);
     setCreatingProgram(true);
   };
 
@@ -172,6 +198,7 @@ export default function AdminPanel() {
         icon: newProgramIcon,
         color: newProgramColor,
         order: newProgramOrder,
+        isActive: newProgramActive,
       });
       toast.success(t("admin.programCreated"));
       setCreatingProgram(false);
@@ -192,6 +219,7 @@ export default function AdminPanel() {
     setEditProgramIcon(program.icon);
     setEditProgramColor(program.color);
     setEditProgramOrder(program.order);
+    setEditProgramActive(program.isActive !== false);
   };
 
   const handleUpdateProgram = async () => {
@@ -208,10 +236,22 @@ export default function AdminPanel() {
         icon: editProgramIcon,
         color: editProgramColor,
         order: editProgramOrder,
+        isActive: editProgramActive,
       });
       toast.success(t("admin.programUpdated"));
       setEditingProgramId(null);
       fetchPrograms();
+    } catch {
+      toast.error(t("admin.programUpdateFailed"));
+    }
+  };
+
+  const handleToggleProgramActive = async (program: Program) => {
+    const newActive = !(program.isActive !== false);
+    try {
+      await updateProgram(program.id, { isActive: newActive });
+      toast.success(newActive ? t("admin.programActivated") : t("admin.programDeactivated"));
+      await fetchPrograms();
     } catch {
       toast.error(t("admin.programUpdateFailed"));
     }
@@ -413,6 +453,22 @@ export default function AdminPanel() {
         </div>
 
         <div className="flex items-center gap-2">
+          <div className={`clip-card-sm border px-3 py-1.5 flex items-center gap-2 ${
+            firebaseConnected
+              ? "bg-poison-green/10 border-poison-green/40"
+              : "bg-neon-red/10 border-neon-red/40"
+          }`}>
+            <div className={`w-2 h-2 rounded-full ${
+              firebaseConnected
+                ? "bg-poison-green shadow-[0_0_8px_rgba(34,197,94,0.6)] animate-pulse"
+                : "bg-neon-red shadow-[0_0_8px_rgba(220,38,38,0.6)]"
+            }`} />
+            <span className={`text-[10px] uppercase tracking-widest font-bold ${
+              firebaseConnected ? "text-poison-green" : "text-neon-red"
+            }`}>
+              {firebaseConnected ? t("admin.firebaseConnected") : t("admin.firebaseDisconnected")}
+            </span>
+          </div>
           <button
             onClick={() => router.push("/")}
             className="clip-button bg-bg-card border border-border px-4 py-2 text-sm text-text-secondary hover:text-text-primary hover:border-neon-red/60 transition-all duration-300 flex items-center gap-2 uppercase tracking-wider font-bold"
@@ -518,17 +574,36 @@ export default function AdminPanel() {
                   ))}
                 </div>
               </div>
-              <div>
-                <label className="block text-[10px] uppercase tracking-widest text-text-muted mb-1">
-                  {t("admin.programOrder")}
-                </label>
-                <input
-                  type="number"
-                  value={newProgramOrder}
-                  onChange={(e) => setNewProgramOrder(parseInt(e.target.value) || 1)}
-                  className="clip-card-sm w-full bg-bg-input border border-border px-3 py-2 text-xs text-text-primary focus:border-neon-red focus:outline-none"
-                  min={1}
-                />
+              <div className="space-y-2">
+                <div>
+                  <label className="block text-[10px] uppercase tracking-widest text-text-muted mb-1">
+                    {t("admin.programOrder")}
+                  </label>
+                  <input
+                    type="number"
+                    value={newProgramOrder}
+                    onChange={(e) => setNewProgramOrder(parseInt(e.target.value) || 1)}
+                    className="clip-card-sm w-full bg-bg-input border border-border px-3 py-2 text-xs text-text-primary focus:border-neon-red focus:outline-none"
+                    min={1}
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] uppercase tracking-widest text-text-muted mb-1">
+                    {t("admin.programStatus")}
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setNewProgramActive(!newProgramActive)}
+                    className={`clip-button px-3 py-2 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 transition-all ${
+                      newProgramActive
+                        ? "bg-poison-green/20 border border-poison-green/50 text-poison-green"
+                        : "bg-bg-card-hover border border-border text-text-muted"
+                    }`}
+                  >
+                    <div className={`w-2 h-2 rounded-full ${newProgramActive ? "bg-poison-green" : "bg-text-muted"}`} />
+                    {newProgramActive ? t("admin.programActive") : t("admin.programInactive")}
+                  </button>
+                </div>
               </div>
             </div>
             <div className="flex flex-wrap gap-2 justify-end">
@@ -567,20 +642,21 @@ export default function AdminPanel() {
             const colors = COLOR_MAP[program.color] || COLOR_MAP.red;
             const days = programDays[program.id] || [];
             const isExpanded = expandedPrograms[program.id];
+            const isActive = program.isActive !== false;
 
             return (
               <div key={program.id} className={`clip-card bg-bg-card border ${colors.border}`}>
                 {/* Program Header */}
-                <button
-                  onClick={() => toggleProgramExpand(program.id)}
-                  className="w-full flex items-center justify-between p-5 hover:bg-bg-card-hover transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`clip-button ${colors.bg} p-2.5`}>
+                <div className="flex items-center justify-between p-5 hover:bg-bg-card-hover transition-colors">
+                  <button
+                    onClick={() => toggleProgramExpand(program.id)}
+                    className="flex items-center gap-3 flex-1 text-left"
+                  >
+                    <div className={`clip-button ${colors.bg} p-2.5 ${!isActive ? "opacity-40" : ""}`}>
                       <span className="text-white">{ICON_MAP[program.icon]}</span>
                     </div>
-                    <div className="text-left">
-                      <h3 className="font-bold uppercase tracking-wider text-sm">
+                    <div>
+                      <h3 className={`font-bold uppercase tracking-wider text-sm ${!isActive ? "text-text-muted" : ""}`}>
                         {lang === "tr" ? program.name_tr || program.name : program.name_en || program.name}
                       </h3>
                       <p className="text-[10px] uppercase tracking-widest text-text-muted">
@@ -590,13 +666,29 @@ export default function AdminPanel() {
                         {days.length > 0 && ` • ${days.length} ${t("programs.days")}`}
                       </p>
                     </div>
+                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleToggleProgramActive(program); }}
+                      className={`clip-button px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest flex items-center gap-1.5 transition-all ${
+                        isActive
+                          ? "bg-poison-green/15 border border-poison-green/40 text-poison-green hover:bg-poison-green/25"
+                          : "bg-bg-card-hover border border-border text-text-muted hover:text-text-primary hover:border-text-muted"
+                      }`}
+                      title={isActive ? t("admin.programActive") : t("admin.programInactive")}
+                    >
+                      <Power size={12} />
+                      {isActive ? t("admin.programActive") : t("admin.programInactive")}
+                    </button>
+                    <button onClick={() => toggleProgramExpand(program.id)} className="p-1">
+                      {isExpanded ? (
+                        <ChevronUp size={20} className="text-text-muted" />
+                      ) : (
+                        <ChevronDown size={20} className="text-text-muted" />
+                      )}
+                    </button>
                   </div>
-                  {isExpanded ? (
-                    <ChevronUp size={20} className="text-text-muted" />
-                  ) : (
-                    <ChevronDown size={20} className="text-text-muted" />
-                  )}
-                </button>
+                </div>
 
                 {/* Expanded Program Content */}
                 {isExpanded && (
@@ -689,17 +781,36 @@ export default function AdminPanel() {
                               ))}
                             </div>
                           </div>
-                          <div>
-                            <label className="block text-[10px] uppercase tracking-widest text-text-muted mb-1">
-                              {t("admin.programOrder")}
-                            </label>
-                            <input
-                              type="number"
-                              value={editProgramOrder}
-                              onChange={(e) => setEditProgramOrder(parseInt(e.target.value) || 1)}
-                              className="clip-card-sm w-full bg-bg-input border border-border px-3 py-2 text-sm text-text-primary focus:border-neon-red focus:outline-none"
-                              min={1}
-                            />
+                          <div className="space-y-2">
+                            <div>
+                              <label className="block text-[10px] uppercase tracking-widest text-text-muted mb-1">
+                                {t("admin.programOrder")}
+                              </label>
+                              <input
+                                type="number"
+                                value={editProgramOrder}
+                                onChange={(e) => setEditProgramOrder(parseInt(e.target.value) || 1)}
+                                className="clip-card-sm w-full bg-bg-input border border-border px-3 py-2 text-sm text-text-primary focus:border-neon-red focus:outline-none"
+                                min={1}
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] uppercase tracking-widest text-text-muted mb-1">
+                                {t("admin.programStatus")}
+                              </label>
+                              <button
+                                type="button"
+                                onClick={() => setEditProgramActive(!editProgramActive)}
+                                className={`clip-button px-3 py-2 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 transition-all ${
+                                  editProgramActive
+                                    ? "bg-poison-green/20 border border-poison-green/50 text-poison-green"
+                                    : "bg-bg-card-hover border border-border text-text-muted"
+                                }`}
+                              >
+                                <div className={`w-2 h-2 rounded-full ${editProgramActive ? "bg-poison-green" : "bg-text-muted"}`} />
+                                {editProgramActive ? t("admin.programActive") : t("admin.programInactive")}
+                              </button>
+                            </div>
                           </div>
                         </div>
                         <div className="flex gap-2">

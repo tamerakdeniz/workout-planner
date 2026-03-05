@@ -87,22 +87,43 @@ export default function ProgramSelector({ programs, dayCounts, onSelect }: Progr
               ? program.description_tr || program.description || ""
               : program.description_en || program.description || "";
 
+          const isActive = program.isActive !== false;
+
           return (
             <button
               key={program.id}
               onClick={() => onSelect(program.id)}
               className={`clip-card bg-bg-card border ${colors.border} p-6 text-left group
-                hover:${colors.glow} hover:border-opacity-100 transition-all duration-300
-                hover:bg-bg-card-hover cursor-pointer`}
+                hover:border-opacity-100 transition-all duration-300
+                hover:bg-bg-card-hover cursor-pointer
+                ${!isActive ? "opacity-50 grayscale" : ""}`}
             >
               <div className="flex items-start justify-between mb-4">
                 <div className={`clip-button ${colors.bg} p-3 transition-all duration-300 group-hover:scale-110`}>
                   <span className="text-white">{icon}</span>
                 </div>
-                <ChevronRight
-                  size={20}
-                  className="text-text-muted group-hover:text-text-primary group-hover:translate-x-1 transition-all duration-300"
-                />
+                <div className="flex items-center gap-2">
+                  <div className={`clip-card-sm px-2 py-1 border ${
+                    isActive
+                      ? "bg-poison-green/10 border-poison-green/40"
+                      : "bg-bg-card-hover border-border"
+                  }`}>
+                    <div className="flex items-center gap-1.5">
+                      <div className={`w-1.5 h-1.5 rounded-full ${
+                        isActive ? "bg-poison-green shadow-[0_0_6px_rgba(34,197,94,0.6)]" : "bg-text-muted"
+                      }`} />
+                      <span className={`text-[9px] uppercase tracking-widest font-bold ${
+                        isActive ? "text-poison-green" : "text-text-muted"
+                      }`}>
+                        {isActive ? t("programs.active") : t("programs.inactive")}
+                      </span>
+                    </div>
+                  </div>
+                  <ChevronRight
+                    size={20}
+                    className="text-text-muted group-hover:text-text-primary group-hover:translate-x-1 transition-all duration-300"
+                  />
+                </div>
               </div>
 
               <h3 className="text-lg font-bold uppercase tracking-wider text-text-primary mb-1 group-hover:text-white transition-colors">
