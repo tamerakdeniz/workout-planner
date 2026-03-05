@@ -1157,7 +1157,7 @@ export default function AdminPanel() {
               {t("admin.confirmDeleteProgramTitle")}
             </h3>
             <p className="text-xs text-text-secondary mb-4">
-              "<span className="text-text-primary">{pendingProgramDelete.name}</span>"{" "}
+              &quot;<span className="text-text-primary">{pendingProgramDelete.name}</span>&quot;{" "}
               {t("admin.confirmDeleteProgramBody")}
             </p>
             <div className="flex justify-end gap-2">
@@ -1189,9 +1189,9 @@ export default function AdminPanel() {
             </h3>
             <p className="text-xs text-text-secondary mb-4">
               {t("admin.confirmDeleteDayBodyPrefix")}{" "}
-              {pendingDayDelete.dayNumber} - "
+              {pendingDayDelete.dayNumber} - &quot;
               <span className="text-text-primary">{pendingDayDelete.title}</span>
-              " {t("admin.confirmDeleteDayBodyMiddle")}
+              &quot; {t("admin.confirmDeleteDayBodyMiddle")}
             </p>
             <div className="flex justify-end gap-2">
               <button
