@@ -65,6 +65,7 @@
        sets: "SET",
        reps: "TEKRAR",
        watchVideo: "VİDEOYU İZLE",
+       note: "NOT",
      },
      admin: {
        adminPanelTitle: "ADMİN PANELİ",
@@ -148,6 +149,8 @@
        reps: "TEKRAR",
        youtubeId: "YOUTUBE VİDEO ID",
        order: "SIRA",
+       noteTr: "NOT (TR)",
+       noteEn: "NOT (EN)",
        save: "KAYDET",
        cancel: "İPTAL",
      },
@@ -208,6 +211,7 @@
        sets: "SETS",
        reps: "REPS",
        watchVideo: "WATCH VIDEO",
+       note: "NOTE",
      },
      admin: {
        adminPanelTitle: "ADMIN PANEL",
@@ -291,6 +295,8 @@
        reps: "REPS",
        youtubeId: "YOUTUBE VIDEO ID",
        order: "ORDER",
+       noteTr: "NOTE (TR)",
+       noteEn: "NOTE (EN)",
        save: "SAVE",
        cancel: "CANCEL",
      },

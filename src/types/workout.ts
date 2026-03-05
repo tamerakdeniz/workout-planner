@@ -10,6 +10,8 @@ export interface Exercise {
   name_en?: string;
   muscleGroup_tr?: string;
   muscleGroup_en?: string;
+  note_tr?: string;
+  note_en?: string;
 }
 
 export interface DayProgram {

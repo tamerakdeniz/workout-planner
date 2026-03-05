@@ -26,6 +26,8 @@ export default function ExerciseForm({
   const [reps, setReps] = useState("12");
   const [youtubeVideoId, setYoutubeVideoId] = useState("");
   const [order, setOrder] = useState(nextOrder);
+  const [noteTr, setNoteTr] = useState("");
+  const [noteEn, setNoteEn] = useState("");
   const { t } = useLanguage();
 
   useEffect(() => {
@@ -38,6 +40,8 @@ export default function ExerciseForm({
       setReps(exercise.reps);
       setYoutubeVideoId(exercise.youtubeVideoId);
       setOrder(exercise.order);
+      setNoteTr(exercise.note_tr ?? "");
+      setNoteEn(exercise.note_en ?? "");
     }
   }, [exercise]);
 
@@ -57,6 +61,8 @@ export default function ExerciseForm({
       reps,
       youtubeVideoId,
       order,
+      note_tr: noteTr.trim() || undefined,
+      note_en: noteEn.trim() || undefined,
     });
   };
 
@@ -176,6 +182,33 @@ export default function ExerciseForm({
               className="clip-card-sm w-full bg-bg-input border border-border px-3 py-2.5 text-sm text-text-primary focus:border-neon-red focus:outline-none transition-colors"
               min={0}
               required
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-[10px] uppercase tracking-widest text-text-muted mb-1.5">
+              {t("adminExerciseForm.noteTr")}
+            </label>
+            <textarea
+              value={noteTr}
+              onChange={(e) => setNoteTr(e.target.value)}
+              className="clip-card-sm w-full bg-bg-input border border-border px-3 py-2.5 text-sm text-text-primary focus:border-neon-red focus:outline-none transition-colors min-h-[80px] resize-y"
+              placeholder="Türkçe not..."
+              rows={3}
+            />
+          </div>
+          <div>
+            <label className="block text-[10px] uppercase tracking-widest text-text-muted mb-1.5">
+              {t("adminExerciseForm.noteEn")}
+            </label>
+            <textarea
+              value={noteEn}
+              onChange={(e) => setNoteEn(e.target.value)}
+              className="clip-card-sm w-full bg-bg-input border border-border px-3 py-2.5 text-sm text-text-primary focus:border-neon-red focus:outline-none transition-colors min-h-[80px] resize-y"
+              placeholder="English note..."
+              rows={3}
             />
           </div>
         </div>

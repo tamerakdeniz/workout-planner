@@ -1065,6 +1065,13 @@ export default function AdminPanel() {
                                           {exercise.reps} {t("exerciseCard.reps")}
                                           {exercise.youtubeVideoId && ` • ID: ${exercise.youtubeVideoId}`}
                                         </p>
+                                        {(exercise.note_tr || exercise.note_en) && (
+                                          <p className="text-xs text-text-secondary mt-1.5 line-clamp-2">
+                                            {lang === "tr"
+                                              ? exercise.note_tr || exercise.note_en
+                                              : exercise.note_en || exercise.note_tr}
+                                          </p>
+                                        )}
                                       </div>
                                       <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <button

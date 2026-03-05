@@ -30,6 +30,11 @@ export default function ExerciseCard({
       ? exercise.name_tr || exercise.name
       : exercise.name_en || exercise.name;
 
+  const displayNote =
+    lang === "tr"
+      ? exercise.note_tr || exercise.note_en
+      : exercise.note_en || exercise.note_tr;
+
   return (
     <div
       className={`
@@ -114,6 +119,18 @@ export default function ExerciseCard({
             </span>
           </div>
         </div>
+
+        {/* Note */}
+        {displayNote && (
+          <div className="mb-5">
+            <span className="text-[10px] uppercase tracking-widest text-text-muted block mb-1.5">
+              {t("exerciseCard.note")}
+            </span>
+            <p className="clip-card-sm bg-bg-primary border border-border px-4 py-3 text-sm text-text-secondary whitespace-pre-wrap">
+              {displayNote}
+            </p>
+          </div>
+        )}
 
         {/* Video Section */}
         {exercise.youtubeVideoId && (
