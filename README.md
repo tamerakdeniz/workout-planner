@@ -1,5 +1,7 @@
 # gym-schedule
 
+- Demo URL: https://gym.wxcodesign.com
+
 A small **Next.js + Firebase** app for managing a gym training schedule (days, exercises, YouTube demo links, etc.).
 
 The project is set up to be **safe to host on GitHub**: real secrets live only in local env files that are already ignored by Git.
