@@ -4,44 +4,109 @@ import { useState, useEffect, useCallback } from "react";
 import DayTabs from "./DayTabs";
 import DayHeader from "./DayHeader";
 import ExerciseCard from "./ExerciseCard";
-import { getAllDays } from "@/lib/firestore";
-import type { DayProgram, CompletionStatus } from "@/types/workout";
-import { Loader2 } from "lucide-react";
+import ProgramSelector from "./ProgramSelector";
+import { getAllPrograms, getDaysByProgram, getAllDays } from "@/lib/firestore";
+import type { DayProgram, Program, CompletionStatus } from "@/types/workout";
+import { Loader2, ArrowLeft } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 
+function getCompletionKey(programId: string | null) {
+  return programId ? `gym-completions-${programId}` : "gym-completions";
+}
+
 export default function WorkoutView() {
+  const [programs, setPrograms] = useState<Program[]>([]);
+  const [dayCounts, setDayCounts] = useState<Record<string, number>>({});
+  const [selectedProgramId, setSelectedProgramId] = useState<string | null>(null);
   const [days, setDays] = useState<DayProgram[]>([]);
   const [activeDay, setActiveDay] = useState(1);
   const [completions, setCompletions] = useState<Record<number, CompletionStatus>>({});
   const [loading, setLoading] = useState(true);
+  const [loadingDays, setLoadingDays] = useState(false);
   const [showResetAllConfirm, setShowResetAllConfirm] = useState(false);
   const { t } = useLanguage();
 
   useEffect(() => {
-    async function fetchDays() {
+    async function init() {
       try {
-        const data = await getAllDays();
-        setDays(data);
+        const [progs, allDays] = await Promise.all([
+          getAllPrograms(),
+          getAllDays(),
+        ]);
+        setPrograms(progs);
 
-        const saved = localStorage.getItem("gym-completions");
-        if (saved) {
-          setCompletions(JSON.parse(saved));
+        const counts: Record<string, number> = {};
+        const orphanDays = [];
+        for (const d of allDays) {
+          if (d.programId) {
+            counts[d.programId] = (counts[d.programId] || 0) + 1;
+          } else {
+            orphanDays.push(d);
+          }
+        }
+        setDayCounts(counts);
+
+        if (progs.length === 0 && orphanDays.length > 0) {
+          setDays(orphanDays);
+          setSelectedProgramId("__legacy__");
+          if (orphanDays.length > 0) {
+            setActiveDay(orphanDays[0].dayNumber);
+          }
+          const saved = localStorage.getItem("gym-completions");
+          if (saved) setCompletions(JSON.parse(saved));
+        } else if (progs.length === 1) {
+          selectProgram(progs[0].id);
         }
       } catch (err) {
-        console.error("Failed to fetch days:", err);
+        console.error("Failed to fetch programs:", err);
       } finally {
         setLoading(false);
       }
     }
-    fetchDays();
+    init();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const selectProgram = useCallback(async (programId: string) => {
+    setSelectedProgramId(programId);
+    setLoadingDays(true);
+    setActiveDay(1);
+    try {
+      const programDays = await getDaysByProgram(programId);
+      setDays(programDays);
+
+      const storageKey = getCompletionKey(programId);
+      const saved = localStorage.getItem(storageKey);
+      if (saved) {
+        setCompletions(JSON.parse(saved));
+      } else {
+        setCompletions({});
+      }
+
+      if (programDays.length > 0) {
+        setActiveDay(programDays[0].dayNumber);
+      }
+    } catch (err) {
+      console.error("Failed to fetch days:", err);
+    } finally {
+      setLoadingDays(false);
+    }
+  }, []);
+
+  const goBackToPrograms = useCallback(() => {
+    setSelectedProgramId(null);
+    setDays([]);
+    setCompletions({});
+    setActiveDay(1);
   }, []);
 
   const saveCompletions = useCallback(
     (updated: Record<number, CompletionStatus>) => {
       setCompletions(updated);
-      localStorage.setItem("gym-completions", JSON.stringify(updated));
+      const storageKey = getCompletionKey(selectedProgramId);
+      localStorage.setItem(storageKey, JSON.stringify(updated));
     },
-    []
+    [selectedProgramId]
   );
 
   const handleToggleComplete = useCallback(
@@ -93,16 +158,50 @@ export default function WorkoutView() {
     );
   }
 
-  if (days.length === 0) {
+  if (!selectedProgramId) {
+    return (
+      <ProgramSelector
+        programs={programs}
+        dayCounts={dayCounts}
+        onSelect={selectProgram}
+      />
+    );
+  }
+
+  if (loadingDays) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="clip-card bg-bg-card border border-border p-8 text-center max-w-md">
-          <p className="text-lg font-bold uppercase tracking-wider text-text-primary mb-2">
-            {t("workout.emptyTitle")}
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 size={40} className="animate-spin text-neon-red" />
+          <p className="text-xs uppercase tracking-widest text-text-muted">
+            {t("workout.loading")}
           </p>
-          <p className="text-sm text-text-secondary">
-            {t("workout.emptyBody")}
-          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (days.length === 0) {
+    return (
+      <div>
+        {programs.length > 1 && (
+          <button
+            onClick={goBackToPrograms}
+            className="clip-button bg-bg-card border border-border px-4 py-2 text-[10px] uppercase tracking-widest font-bold text-text-secondary hover:text-neon-red hover:border-neon-red transition-all duration-300 flex items-center gap-2 mb-6"
+          >
+            <ArrowLeft size={14} />
+            {t("workout.backToPrograms")}
+          </button>
+        )}
+        <div className="flex items-center justify-center min-h-[50vh]">
+          <div className="clip-card bg-bg-card border border-border p-8 text-center max-w-md">
+            <p className="text-lg font-bold uppercase tracking-wider text-text-primary mb-2">
+              {t("workout.emptyTitle")}
+            </p>
+            <p className="text-sm text-text-secondary">
+              {t("workout.emptyBody")}
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -110,6 +209,16 @@ export default function WorkoutView() {
 
   return (
     <div>
+      {programs.length > 1 && (
+        <button
+          onClick={goBackToPrograms}
+          className="clip-button bg-bg-card border border-border px-4 py-2 text-[10px] uppercase tracking-widest font-bold text-text-secondary hover:text-neon-red hover:border-neon-red transition-all duration-300 flex items-center gap-2 mb-6"
+        >
+          <ArrowLeft size={14} />
+          {t("workout.backToPrograms")}
+        </button>
+      )}
+
       <div className="mb-6">
         <DayTabs days={days} activeDay={activeDay} onDayChange={setActiveDay} />
       </div>

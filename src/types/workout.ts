@@ -6,7 +6,6 @@ export interface Exercise {
   reps: string;
   youtubeVideoId: string;
   order: number;
-  // Optional localized fields – new structure, kept alongside legacy strings
   name_tr?: string;
   name_en?: string;
   muscleGroup_tr?: string;
@@ -19,11 +18,27 @@ export interface DayProgram {
   title: string;
   subtitle: string;
   exercises: Exercise[];
-  // Optional localized fields for day metadata
+  programId: string;
   title_tr?: string;
   title_en?: string;
   subtitle_tr?: string;
   subtitle_en?: string;
+}
+
+export type ProgramIcon = "dumbbell" | "home" | "stretch" | "heart" | "zap" | "target" | "flame" | "swords";
+export type ProgramColor = "red" | "blue" | "green" | "purple" | "orange" | "cyan" | "pink" | "yellow";
+
+export interface Program {
+  id: string;
+  name: string;
+  name_tr?: string;
+  name_en?: string;
+  description?: string;
+  description_tr?: string;
+  description_en?: string;
+  icon: ProgramIcon;
+  color: ProgramColor;
+  order: number;
 }
 
 export interface CompletionStatus {
