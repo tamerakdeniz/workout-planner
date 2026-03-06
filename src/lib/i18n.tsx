@@ -167,6 +167,9 @@
        title: "SAYFA BULUNAMADI",
        body: "Aradığınız sayfa mevcut değil veya taşınmış olabilir.",
      },
+     footer: {
+       copyright: "Tüm hakları saklıdır.",
+     },
    },
    en: {
      common: {
@@ -312,6 +315,9 @@
      notFound: {
        title: "PAGE NOT FOUND",
        body: "The page you are looking for does not exist or may have been moved.",
+     },
+     footer: {
+       copyright: "All rights reserved.",
      },
    },
  } as const;
